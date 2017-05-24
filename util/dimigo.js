@@ -44,15 +44,15 @@ class Dimigo {
       password: hash(password)
     }
 
-    return this.instance('/users/identify', { params })
+    return this.fetch('/users/identify', { params })
   }
 
   async getStudent (username) {
-    return this.instance(`/user-students/${username}`)
+    return this.fetch(`/user-students/${username}`)
   }
 
   async getTeacher (username) {
-    return this.instance(`/user-teachers/${username}`)
+    return this.fetch(`/user-teachers/${username}`)
   }
 }
 
