@@ -4,4 +4,4 @@ module.exports = {
   DIMIGO_API_PW: ''
 }
 
-throw new Error('상단의 값들을 설정한 후 파일명을 `secret.js`로 변경하세요!')
+throw new Error('상단의 값들을 설정한 후, `secret.js`로 파일명을 변경하고 이 라인을 주석 처리하세요')

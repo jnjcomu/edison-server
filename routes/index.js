@@ -1,5 +1,5 @@
 const compose = require('koa-compose')
-const routes = 'auth'.split(' ')
+const routes = 'auth places'.split(' ')
 
 module.exports = () => compose(routes
   .map(name => require(`./${name}`))
