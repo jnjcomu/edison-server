@@ -5,7 +5,7 @@ const config = require('../config')
 const secret = require('../config/secret')
 const Dimigo = require('../util/dimigo')
 
-const api = new Dimigo(config.DIMIGO_API_HOST, secret.DIMIGO_API_ID, secret.DIMIGO_API_PW)
+const api = new Dimigo()
 
 class UserClass {
   static async authenticate ({ username, password }) {
@@ -13,15 +13,15 @@ class UserClass {
     if (!password) throw new Error('password is undefined')
 
     const { data } = await api.identifyUser(username, password)
-    const { id, name, user_type: userType } = data
+    const { id, name, user_type: userType, email, gender, nickname } = data
 
     let user = await this.findOne({ username })
-    if (!user) user = new this({ id, username, name, userType })
+    if (!user) user = new this({ id, username, name, userType, email, gender, nickname })
 
     await user.save()
 
     const token = { id, name, userType }
-    return jwt.sign(token, secret.JWT_SECRET, { expiresIn: '2h' })
+    return jwt.sign(token, secret.JWT_SECRET, { expiresIn: config.TOKEN_LIFETIME })
   }
 }
 
@@ -30,7 +30,11 @@ const schema = mongoose.Schema({
   username: { type: String, unique: true },
 
   name: String,
-  userType: String
+  userType: String,
+
+  email: String,
+  gender: String,
+  nickname: String
 })
 
 schema.loadClass(UserClass)

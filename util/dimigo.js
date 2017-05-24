@@ -2,8 +2,17 @@ const axios = require('axios')
 const crc32 = require('crc-32')
 const sha256 = require('sha256')
 
+const secret = require('../config/secret')
+const defaults = {
+  host: secret.DIMIGO_API_HOST,
+  username: secret.DIMIGO_API_USERNAME,
+  password: secret.DIMIGO_API_PASSWORD
+}
+
 class Dimigo {
-  constructor (host, username, password) {
+  constructor (options = defaults) {
+    const { host, username, password } = options
+
     this.host = host
     this.username = username
     this.password = password
@@ -29,10 +38,10 @@ class Dimigo {
     return '@' + sha256(password + padded)
   }
 
-  async identifyUser (username, password, secure = true) {
+  async identifyUser (username, password, hash = Dimigo.createHash) {
     const params = {
       username,
-      password: secure ? Dimigo.createHash(password) : password
+      password: hash(password)
     }
 
     return this.instance('/users/identify', { params })
