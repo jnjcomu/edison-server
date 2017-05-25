@@ -8,5 +8,6 @@ module.exports = () => async (ctx, next) => {
 
     ctx.body = output.payload
     ctx.status = output.statusCode
+    ctx.app.emit('error', err, ctx)
   }
 }
