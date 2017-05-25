@@ -9,7 +9,7 @@ const defaults = {
   password: secret.DIMIGO_API_PASSWORD
 }
 
-module.exports = class Dimigo {
+class Dimigo {
   constructor (options = defaults) {
     const { host: baseURL, username, password } = options
     this.instance = axios.create({ baseURL, auth: { username, password } })
@@ -50,3 +50,15 @@ module.exports = class Dimigo {
     return this.fetch(`/user-teachers/${username}`)
   }
 }
+
+Dimigo.userTypes = {
+  T: '교사',
+  D: '생활관교사',
+  S: '학생', // or 졸업생 (see `user_gcn_history` table)
+  P: '학부모',
+  O: '손님'
+}
+
+Dimigo.genders = { M: '남자', F: '여자', NULL: 'Unknown' }
+
+module.exports = Dimigo
