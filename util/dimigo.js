@@ -9,25 +9,20 @@ const defaults = {
   password: secret.DIMIGO_API_PASSWORD
 }
 
-class Dimigo {
+module.exports = class Dimigo {
   constructor (options = defaults) {
-    const { host, username, password } = options
-
-    this.host = host
-    this.username = username
-    this.password = password
-
-    this.instance = axios.create({
-      baseURL: host,
-      auth: { username, password }
-    })
+    const { host: baseURL, username, password } = options
+    this.instance = axios.create({ baseURL, auth: { username, password } })
   }
 
   async fetch (url, options = {}) {
     try {
       return await this.instance.get(url, options)
     } catch (err) {
-      throw new Error(err.response ? err.response.data : err)
+      if (!err.response) throw err
+
+      const { data, status, statusText } = err.response
+      throw new Error(`${status} ${statusText}: ${data} (${err.message})`)
     }
   }
 
@@ -39,11 +34,7 @@ class Dimigo {
   }
 
   async identifyUser (username, password, hash = Dimigo.createHash) {
-    const params = {
-      username,
-      password: hash(password)
-    }
-
+    const params = { username, password: hash(password) }
     return this.fetch('/users/identify', { params })
   }
 
@@ -55,5 +46,3 @@ class Dimigo {
     return this.fetch(`/user-teachers/${username}`)
   }
 }
-
-module.exports = Dimigo

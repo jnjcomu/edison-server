@@ -1,14 +1,17 @@
+const Boom = require('boom')
 const Router = require('koa-router')
-const router = new Router({ prefix: '/places' })
 
 const Place = require('../models/Place')
+const router = new Router({ prefix: '/places' })
 
 router.post('/', async (ctx) => {
   try {
     ctx.body = await Place.find({})
   } catch (err) {
-    console.error(err)
-    ctx.throw(401, err.message)
+    const { statusCode, payload } = Boom.unauthorized(err).output
+
+    ctx.body = payload
+    ctx.status = statusCode
   }
 })
 
