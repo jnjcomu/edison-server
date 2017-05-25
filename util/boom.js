@@ -4,7 +4,7 @@ module.exports = () => async (ctx, next) => {
   try {
     await next()
   } catch (err) {
-    const { output } = Boom.internal(err)
+    const { output } = Boom.wrap(err, err.statusCode)
 
     ctx.body = output.payload
     ctx.status = output.statusCode

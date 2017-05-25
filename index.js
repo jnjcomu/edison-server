@@ -6,7 +6,7 @@ const bodyParser = require('koa-bodyparser')
 
 const routes = require('./routes')
 const logger = require('./logger')
-const boom = require('./util/handler')
+const boom = require('./util/boom')
 
 const config = require('./config')
 const mongoose = require('mongoose')
