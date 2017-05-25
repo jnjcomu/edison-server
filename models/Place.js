@@ -3,10 +3,12 @@ const mongoose = require('mongoose')
 class PlaceClass {
   static async findById (ctx) {
     const { id } = ctx.params
-    const place = this.findOne({ id })
 
-    if (place) ctx.body = place
-    else ctx.status = 404
+    const place = await this.findOne({ id })
+    if (place) return (ctx.body = place)
+
+    const err = new Error()
+    throw (err.statusCode = 404, err)
   }
 }
 

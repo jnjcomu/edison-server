@@ -19,14 +19,14 @@ module.exports = class Dimigo {
     try {
       return await this.instance.get(url, options)
     } catch (err) {
+      if (!err) throw new Error()
       if (!err.response) throw err
+
       const { status, data } = err.response
-
       if (status !== 404) throw err
-      const error = new Error(data.message || err.message)
 
-      error.statusCode = 401
-      throw error
+      const error = new Error(data.message || err.message)
+      throw (error.statusCode = 401, error)
     }
   }
 

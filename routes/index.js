@@ -1,6 +1,9 @@
 const compose = require('koa-compose')
 const routes = 'auth places'.split(' ')
 
-module.exports = () => compose(routes
-  .map(name => require(`./${name}`))
-  .reduce((list, r) => list.concat(r.routes(), r.allowedMethods()), []))
+const middleware = routes
+  .map(name => require(`./${name}.js`))
+  .map(r => [r.routes(), r.allowedMethods()])
+  .reduce((a, b) => a.concat(b))
+
+module.exports = () => compose(middleware)

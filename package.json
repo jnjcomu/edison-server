@@ -4,7 +4,8 @@
   "description": "WOw",
   "main": "index.js",
   "scripts": {
-    "test": "standard"
+    "test": "standard",
+    "start": "nodemon ."
   },
   "repository": {
     "type": "git",
@@ -38,6 +39,7 @@
     "sha256": "^0.2.0"
   },
   "devDependencies": {
+    "nodemon": "^1.11.0",
     "standard": "^10.0.2"
   }
 }
