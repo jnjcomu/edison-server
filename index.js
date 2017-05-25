@@ -6,8 +6,9 @@ const bodyParser = require('koa-bodyparser')
 
 const routes = require('./routes')
 const logger = require('./logger')
-const config = require('./config')
+const boom = require('./util/handler')
 
+const config = require('./config')
 const mongoose = require('mongoose')
 mongoose.Promise = global.Promise
 
@@ -20,6 +21,7 @@ function startApp () {
     .use(conditional())
     .use(etag())
     .use(bodyParser())
+    .use(boom())
     .use(routes())
 
   app.listen(port, () => console.log(`Listening on port ${port}`))
