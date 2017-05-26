@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
+// const mongooseHidden = require('mongoose-hidden')
 
 const config = require('../config')
 const secret = require('../config/secret')
@@ -9,6 +10,7 @@ const api = new Dimigo()
 
 const adminUserTypes = 'TD' // 교사 or 생활관교사
 const tokenFields = 'id username isAdmin tokenNumber'.split(' ')
+const jwtOptions = [secret.JWT_SECRET, { expiresIn: config.TOKEN_LIFETIME }]
 
 class UserClass {
   static async authenticate ({ username, password }) {
@@ -27,15 +29,14 @@ class UserClass {
 
   async createToken (increment = 1) {
     this.tokenNumber = increment + (this.tokenNumber || 0)
-    await this.save()
 
-    const that = this.toObject({ virtuals: true })
-    const token = Object.keys(that)
+    const token = Object.keys(this.toObject())
       .filter(key => tokenFields.includes(key))
       .map(key => ({ [key]: this[key] }))
       .reduce((a, b) => Object.assign(a, b), {})
 
-    return jwt.sign(token, secret.JWT_SECRET, { expiresIn: config.TOKEN_LIFETIME })
+    await this.save()
+    return jwt.sign(token, ...jwtOptions)
   }
 
   get isAdmin () {
@@ -58,4 +59,8 @@ const schema = mongoose.Schema({
 })
 
 schema.loadClass(UserClass)
+schema.set('toJSON', { getters: true, virtuals: true })
+schema.set('toObject', { getters: true, virtuals: true })
+
+// schema.plugin(mongooseHidden({ hidden: { _id: true, __v: true } }))
 module.exports = mongoose.model('User', schema)
