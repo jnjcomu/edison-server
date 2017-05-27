@@ -1,16 +1,30 @@
 const jwt = require('jsonwebtoken')
 const secret = require('../config/secret')
-
 const User = require('../models/User')
 
-const error = (statusCode, message, err) =>
-  (err = new Error(message)) && (err.statusCode = statusCode) && err
+function error (statusCode, message) {
+  const err = new Error(message)
+  err.statusCode = statusCode
+
+  return err
+}
+
+async function verify (token) {
+  try {
+    return await jwt.verify(token, secret.JWT_SECRET)
+  } catch (err) {
+    if (err.name !== 'TokenExpiredError') throw err
+    throw error(401, `token expired at ${err.expiredAt.toISOString()}`)
+  }
+}
 
 module.exports = (adminOnly = false) => async (ctx, next) => {
   const { token } = ctx.request.body
   if (!token) throw error(401, 'a token is reqired')
 
-  const payload = await jwt.verify(token, secret.JWT_SECRET)
+  const payload = await verify(token)
+  if (!payload) throw error(401, 'no payload included')
+
   const { id, username, isAdmin, tokenNumber: no } = payload
   if (adminOnly && !isAdmin) throw error(401, `access denied`)
 

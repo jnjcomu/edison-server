@@ -6,9 +6,7 @@ module.exports = () => async (ctx, next) => {
   } catch (err) {
     const { output, isServer } = Boom.wrap(err, err.statusCode)
 
-    ctx.body = output.payload
-    ctx.status = output.statusCode
-
-    if (isServer) ctx.app.emit('error', err, ctx)
+    if (isServer) ctx.app.emit('error', err, ctx);
+    [ctx.body, ctx.status] = [output.payload, output.statusCode]
   }
 }
