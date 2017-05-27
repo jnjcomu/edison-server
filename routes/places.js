@@ -10,6 +10,6 @@ router.get('/', async (ctx) =>
   (ctx.body = await Place.find()))
 
 router.get('/:id', async (ctx) =>
-  (ctx.body = Place.findById(ctx)))
+  (ctx.body = await Place.findById(ctx)))
 
 module.exports = router

@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
-// const mongooseHidden = require('mongoose-hidden')
+const mongooseHidden = require('mongoose-hidden')
 
 const config = require('../config')
 const secret = require('../config/secret')
@@ -62,5 +62,5 @@ schema.loadClass(UserClass)
 schema.set('toJSON', { getters: true, virtuals: true })
 schema.set('toObject', { getters: true, virtuals: true })
 
-// schema.plugin(mongooseHidden({ hidden: { _id: true, __v: true } }))
+schema.plugin(mongooseHidden())
 module.exports = mongoose.model('User', schema)

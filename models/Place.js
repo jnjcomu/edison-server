@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const mongooseHidden = require('mongoose-hidden')
 
 class PlaceClass {
   static async findById (ctx) {
@@ -21,4 +22,8 @@ const schema = new mongoose.Schema({
 })
 
 schema.loadClass(PlaceClass)
+schema.set('toJSON', { getters: true, virtuals: true })
+schema.set('toObject', { getters: true, virtuals: true })
+
+schema.plugin(mongooseHidden())
 module.exports = mongoose.model('Place', schema)
