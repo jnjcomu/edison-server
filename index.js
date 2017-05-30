@@ -1,20 +1,23 @@
 const Koa = require('koa')
+const config = require('config')
+const mongoose = require('mongoose')
 
 const etag = require('koa-etag')
-const conditional = require('koa-conditional-get')
 const bodyParser = require('koa-bodyparser')
+const conditional = require('koa-conditional-get')
 
+const boom = require('./util/boom')
 const routes = require('./routes')
 const logger = require('./logger')
-const boom = require('./util/boom')
 
-const config = require('./config')
-const mongoose = require('mongoose')
-mongoose.Promise = global.Promise
+function connect () {
+  mongoose.Promise = global.Promise
+  return mongoose.connect(config.get('mongodb.uri'))
+}
 
 function startApp () {
   const app = new Koa()
-  const port = process.env.PORT || config.PORT
+  const port = process.env.PORT || config.get('port')
 
   app
     .use(logger())
@@ -27,6 +30,6 @@ function startApp () {
   app.listen(port, () => console.log(`Listening on port ${port}`))
 }
 
-mongoose
-  .connect(config.MONGODB_URI)
-  .then(startApp).catch(console.error.bind(console))
+connect()
+  .then(startApp)
+  .catch(err => console.error(err))

@@ -1,5 +1,5 @@
+const config = require('config')
 const jwt = require('jsonwebtoken')
-const secret = require('../config/secret')
 const User = require('../models/User')
 
 function error (statusCode, message) {
@@ -11,7 +11,7 @@ function error (statusCode, message) {
 
 async function verify (token) {
   try {
-    return await jwt.verify(token, secret.JWT_SECRET)
+    return await jwt.verify(token, config.get('jwt.secret'))
   } catch (err) {
     if (err.name !== 'TokenExpiredError') throw err
     throw error(401, `token expired at ${err.expiredAt.toISOString()}`)

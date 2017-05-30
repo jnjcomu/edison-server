@@ -1,13 +1,9 @@
 const axios = require('axios')
 const crc32 = require('crc-32')
 const sha256 = require('sha256')
+const config = require('config')
 
-const secret = require('../config/secret')
-const defaults = {
-  host: secret.DIMIGO_API_HOST,
-  username: secret.DIMIGO_API_USERNAME,
-  password: secret.DIMIGO_API_PASSWORD
-}
+const defaults = config.get('dimigo')
 
 class Dimigo {
   constructor (options = defaults) {

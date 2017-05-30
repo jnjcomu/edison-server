@@ -2,15 +2,17 @@ const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 const mongooseHidden = require('mongoose-hidden')
 
-const config = require('../config')
-const secret = require('../config/secret')
 const Dimigo = require('../util/dimigo')
-
 const api = new Dimigo()
+
+const config = require('config')
+const jwtOptions = [
+  config.get('jwt.secret'),
+  { expiresIn: config.get('jwt.lifetime') }
+]
 
 const adminUserTypes = 'TD' // 교사 or 생활관교사
 const tokenFields = 'id username isAdmin tokenNumber'.split(' ')
-const jwtOptions = [secret.JWT_SECRET, { expiresIn: config.TOKEN_LIFETIME }]
 
 class UserClass {
   static async authenticate ({ username, password }) {

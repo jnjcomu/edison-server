@@ -1,0 +1,18 @@
+{
+  port: 20409,
+
+  mongodb: {
+    uri: 'mongodb://localhost/edison',
+  },
+
+  jwt: {
+    secret: '',
+    lifetime: '2h'
+  },
+
+  dimigo: {
+    host: '',
+    username: '',
+    password: ''
+  }
+}
