@@ -14,7 +14,13 @@ const jwtOptions = [
 ]
 
 const adminUserTypes = 'TD' // 교사 or 생활관교사
-const tokenFields = 'id username isAdmin tokenNumber'.split(' ')
+const studentFields = 'grade clazz number serial'.split(' ')
+const tokenFields = 'id username isAdmin tokenNumber information'.split(' ')
+
+const filterObject = (obj, list) => Object.keys(obj)
+  .filter(key => list.includes(key))
+  .map(key => ({ [key]: obj[key] }))
+  .reduce((a, b) => Object.assign(a, b), {})
 
 class UserClass {
   static async authenticate ({ username, password }) {
@@ -27,7 +33,9 @@ class UserClass {
     let user = await this.findOne({ username })
     if (!user) user = new this({ id, username, name, userType, email, gender, nickname })
 
+    user.information = await user.getInformation()
     await user.save()
+
     return user.createToken()
   }
 
@@ -35,23 +43,26 @@ class UserClass {
     return this.isHassan || adminUserTypes.includes(this.userType)
   }
 
+  async getInformation () {
+    switch (this.userType) {
+      case 'S':
+        const student = await api.getStudent(this.username)
+        return filterObject(student, studentFields)
+
+      default: return {}
+    }
+  }
+
   async createToken (increment = 1) {
     this.tokenNumber = increment + (this.tokenNumber || 0)
-
-    const token = Object.keys(this.toObject())
-      .filter(key => tokenFields.includes(key))
-      .map(key => ({ [key]: this[key] }))
-      .reduce((a, b) => Object.assign(a, b), {})
+    const token = filterObject(this.toObject(), tokenFields)
 
     await this.save()
     return jwt.sign(token, ...jwtOptions)
   }
 
   async enter (ctx) {
-    console.log('enter')
     await this.leave()
-
-    console.log('enter leave')
 
     const place = await Place.findByContext(ctx)
     place.addUser(this)
@@ -61,7 +72,6 @@ class UserClass {
   }
 
   async leave () {
-    console.log('leave', this.place)
     if (!this.place) return
 
     const place = await Place.findById(this.place)
@@ -77,14 +87,15 @@ const schema = mongoose.Schema({
   username: { type: String, unique: true },
 
   name: String,
-  userType: String,
-  tokenNumber: { type: Number, default: 0 },
-  isHassan: { type: Boolean, default: false },
-
   email: String,
   gender: String,
   nickname: String,
 
+  userType: String,
+  information: Object,
+  isHassan: { type: Boolean, default: false },
+
+  tokenNumber: { type: Number, default: 0 },
   place: { type: mongoose.Schema.Types.ObjectId, ref: 'Place' }
 })
 
