@@ -1,5 +1,7 @@
 const config = require('config')
 const jwt = require('jsonwebtoken')
+
+const Place = require('./Place')
 const mongoose = require('mongoose')
 const mongooseHidden = require('mongoose-hidden')
 
@@ -29,6 +31,10 @@ class UserClass {
     return user.createToken()
   }
 
+  get isAdmin () {
+    return this.isHassan || adminUserTypes.includes(this.userType)
+  }
+
   async createToken (increment = 1) {
     this.tokenNumber = increment + (this.tokenNumber || 0)
 
@@ -41,8 +47,28 @@ class UserClass {
     return jwt.sign(token, ...jwtOptions)
   }
 
-  get isAdmin () {
-    return this.isHassan || adminUserTypes.includes(this.userType)
+  async enter (ctx) {
+    console.log('enter')
+    await this.leave()
+
+    console.log('enter leave')
+
+    const place = await Place.findByContext(ctx)
+    place.addUser(this)
+
+    this.place = place._id
+    return this.save()
+  }
+
+  async leave () {
+    console.log('leave', this.place)
+    if (!this.place) return
+
+    const place = await Place.findById(this.place)
+    place.removeUser(this)
+
+    this.place = null
+    return this.save()
   }
 }
 
@@ -57,7 +83,9 @@ const schema = mongoose.Schema({
 
   email: String,
   gender: String,
-  nickname: String
+  nickname: String,
+
+  place: { type: mongoose.Schema.Types.ObjectId, ref: 'Place' }
 })
 
 schema.loadClass(UserClass)

@@ -7,9 +7,6 @@ const User = require('../models/User')
 async function isRevoked (ctx, user, token) {
   const { id, username, tokenNumber } = user
   const document = await User.findOne({ id, username })
-
-  console.log(token, user, id, username, tokenNumber, document)
-
   return !document || tokenNumber !== document.tokenNumber
 }
 
