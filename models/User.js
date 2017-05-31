@@ -1,11 +1,11 @@
+const config = require('config')
 const jwt = require('jsonwebtoken')
 const mongoose = require('mongoose')
 const mongooseHidden = require('mongoose-hidden')
 
-const Dimigo = require('../util/dimigo')
-const api = new Dimigo()
+const Dimigo = require('dimigo')
+const api = new Dimigo(config.get('dimigo'))
 
-const config = require('config')
 const jwtOptions = [
   config.get('jwt.secret'),
   { expiresIn: config.get('jwt.lifetime') }
@@ -19,8 +19,8 @@ class UserClass {
     if (!username) throw new Error('username is undefined')
     if (!password) throw new Error('password is undefined')
 
-    const { data } = await api.identifyUser(username, password)
-    const { id, name, user_type: userType, email, gender, nickname } = data
+    const data = await api.identifyUser(username, password)
+    const { id, name, userType, email, gender, nickname } = data
 
     let user = await this.findOne({ username })
     if (!user) user = new this({ id, username, name, userType, email, gender, nickname })

@@ -58,4 +58,5 @@ typings/
 .env
 
 # Config files
-production.json5
+config/*.json5
+!config/example.json5
