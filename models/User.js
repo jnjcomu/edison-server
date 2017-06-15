@@ -15,7 +15,6 @@ const jwtOptions = [
 
 const adminUserTypes = 'TD' // 교사 or 생활관교사
 const studentFields = 'grade clazz number serial'.split(' ')
-const tokenFields = 'id username isAdmin tokenNumber information'.split(' ')
 
 const filterObject = (obj, list) => Object.keys(obj)
   .filter(key => list.includes(key))
@@ -34,9 +33,7 @@ class UserClass {
     if (!user) user = new this({ id, username, name, userType, email, gender, nickname })
 
     user.information = await user.getInformation()
-    await user.save()
-
-    return user.createToken()
+    return { token: await user.createToken() }
   }
 
   get isAdmin () {
@@ -55,10 +52,9 @@ class UserClass {
 
   async createToken (increment = 1) {
     this.tokenNumber = increment + (this.tokenNumber || 0)
-    const token = filterObject(this.toObject(), tokenFields)
-
     await this.save()
-    return jwt.sign(token, ...jwtOptions)
+
+    return jwt.sign(this.toObject(), ...jwtOptions)
   }
 
   async enter (ctx) {
