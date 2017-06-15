@@ -21,10 +21,17 @@ const filterObject = (obj, list) => Object.keys(obj)
   .map(key => ({ [key]: obj[key] }))
   .reduce((a, b) => Object.assign(a, b), {})
 
+const undefinedError = field => {
+  const error = new Error(`${field} is undefined`)
+  error.statusCode = 400
+
+  return error
+}
+
 class UserClass {
   static async authenticate ({ username, password }) {
-    if (!username) throw new Error('username is undefined')
-    if (!password) throw new Error('password is undefined')
+    if (!username) throw undefinedError('username')
+    if (!password) throw undefinedError('password')
 
     const data = await api.identifyUser(username, password)
     const { id, name, userType, email, gender, nickname } = data
