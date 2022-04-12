@@ -39,7 +39,7 @@
     "koa-jwt": "^3.2.2",
     "koa-router": "^7.1.1",
     "moment": "^2.18.1",
-    "mongoose": "^4.9.9",
+    "mongoose": "^5.7.5",
     "mongoose-hidden": "^1.4.0",
     "sha256": "^0.2.0"
   },
